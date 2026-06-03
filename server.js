@@ -11,7 +11,27 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'frontend/public')));
+app.use(express.static(path.join(__dirname, 'frontend/public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.png'))  res.setHeader('Content-Type', 'image/png');
+    if (filePath.endsWith('.json')) res.setHeader('Content-Type', 'application/json');
+    if (filePath.endsWith('.js'))   res.setHeader('Content-Type', 'application/javascript');
+  }
+}));
+
+// Rutas explícitas para íconos PWA
+app.get('/icon-192.png', (req, res) => {
+  res.setHeader('Content-Type', 'image/png');
+  res.sendFile(path.join(__dirname, 'frontend/public/icon-192.png'));
+});
+app.get('/icon-512.png', (req, res) => {
+  res.setHeader('Content-Type', 'image/png');
+  res.sendFile(path.join(__dirname, 'frontend/public/icon-512.png'));
+});
+app.get('/manifest.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/manifest+json');
+  res.sendFile(path.join(__dirname, 'frontend/public/manifest.json'));
+});
 
 // ── Base de datos JSON simple (sin dependencias nativas) ──────────
 const DB_FILE = path.join(__dirname, 'ecosanjuan_data.json');
