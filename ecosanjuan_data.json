@@ -1,0 +1,281 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "dni": "admin",
+      "nombre": "Administrador",
+      "email": "admincondominio@gmail.com",
+      "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+      "rol": "admin",
+      "bloque": null,
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 2,
+      "dni": "71433258",
+      "nombre": "Micaela Hernández",
+      "email": "mica.hernandez@gmail.com",
+      "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
+      "rol": "usuario",
+      "bloque": "B-03",
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 3,
+      "dni": "71433259",
+      "nombre": "Carlos Pérez",
+      "email": "carlos.perez@gmail.com",
+      "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
+      "rol": "usuario",
+      "bloque": "A-01",
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 4,
+      "dni": "71433260",
+      "nombre": "Ana Torres",
+      "email": "ana.torres@gmail.com",
+      "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
+      "rol": "usuario",
+      "bloque": "C-12",
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 5,
+      "dni": "71433261",
+      "nombre": "Luis Mamani",
+      "email": "luis.mamani@gmail.com",
+      "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
+      "rol": "usuario",
+      "bloque": "D-05",
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 6,
+      "dni": "71433262",
+      "nombre": "Rosa Quispe",
+      "email": "rosa.quispe@gmail.com",
+      "password": "e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446",
+      "rol": "usuario",
+      "bloque": "B-10",
+      "activo": 1,
+      "created_at": "2026-06-03 02:20:22"
+    }
+  ],
+  "residuos": [
+    {
+      "id": 1,
+      "usuario_id": 2,
+      "fecha": "2025-11-07",
+      "hora": "18:10",
+      "bolsas": 2,
+      "tipo": "organico",
+      "zona": "BLOQUE A",
+      "selectiva": 1,
+      "observaciones": "Residuos de cocina",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 2,
+      "usuario_id": 3,
+      "fecha": "2025-11-07",
+      "hora": "17:55",
+      "bolsas": 1,
+      "tipo": "reciclable",
+      "zona": "ACOPIO 56",
+      "selectiva": 1,
+      "observaciones": "Botellas de plástico",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 3,
+      "usuario_id": 4,
+      "fecha": "2025-11-06",
+      "hora": "18:05",
+      "bolsas": 3,
+      "tipo": "general",
+      "zona": "BLOQUE B",
+      "selectiva": 0,
+      "observaciones": "Desmonte pequeño",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 4,
+      "usuario_id": 2,
+      "fecha": "2025-11-06",
+      "hora": "18:15",
+      "bolsas": 1,
+      "tipo": "reciclable",
+      "zona": "ACOPIO 56",
+      "selectiva": 1,
+      "observaciones": "",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 5,
+      "usuario_id": 5,
+      "fecha": "2025-11-05",
+      "hora": "18:00",
+      "bolsas": 2,
+      "tipo": "organico",
+      "zona": "BLOQUE A",
+      "selectiva": 1,
+      "observaciones": "",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 6,
+      "usuario_id": 6,
+      "fecha": "2025-11-04",
+      "hora": "18:20",
+      "bolsas": 1,
+      "tipo": "reciclable",
+      "zona": "ACOPIO 56",
+      "selectiva": 1,
+      "observaciones": "Cartones",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 7,
+      "usuario_id": 3,
+      "fecha": "2025-11-03",
+      "hora": "17:50",
+      "bolsas": 2,
+      "tipo": "general",
+      "zona": "BLOQUE B",
+      "selectiva": 0,
+      "observaciones": "",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 8,
+      "usuario_id": 4,
+      "fecha": "2025-11-02",
+      "hora": "18:05",
+      "bolsas": 1,
+      "tipo": "organico",
+      "zona": "BLOQUE A",
+      "selectiva": 1,
+      "observaciones": "",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 9,
+      "usuario_id": 2,
+      "fecha": "2026-06-03",
+      "hora": "21:30",
+      "bolsas": 1,
+      "tipo": "organico",
+      "zona": "ACOPIO 56",
+      "selectiva": 1,
+      "observaciones": "Cartón",
+      "created_at": "2026-06-03 02:30:09"
+    }
+  ],
+  "tiempos": [
+    {
+      "id": 1,
+      "usuario_id": 2,
+      "fecha": "2025-10-01",
+      "segundos": 798,
+      "tipo": "PRE",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 2,
+      "usuario_id": 3,
+      "fecha": "2025-10-01",
+      "segundos": 810,
+      "tipo": "PRE",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 3,
+      "usuario_id": 4,
+      "fecha": "2025-10-01",
+      "segundos": 780,
+      "tipo": "PRE",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 4,
+      "usuario_id": 5,
+      "fecha": "2025-10-01",
+      "segundos": 828,
+      "tipo": "PRE",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 5,
+      "usuario_id": 6,
+      "fecha": "2025-10-01",
+      "segundos": 792,
+      "tipo": "PRE",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 6,
+      "usuario_id": 2,
+      "fecha": "2025-11-07",
+      "segundos": 654,
+      "tipo": "POST",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 7,
+      "usuario_id": 3,
+      "fecha": "2025-11-07",
+      "segundos": 642,
+      "tipo": "POST",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 8,
+      "usuario_id": 4,
+      "fecha": "2025-11-06",
+      "segundos": 618,
+      "tipo": "POST",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 9,
+      "usuario_id": 5,
+      "fecha": "2025-11-05",
+      "segundos": 660,
+      "tipo": "POST",
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 10,
+      "usuario_id": 6,
+      "fecha": "2025-11-04",
+      "segundos": 636,
+      "tipo": "POST",
+      "created_at": "2026-06-03 02:20:22"
+    }
+  ],
+  "notificaciones": [
+    {
+      "id": 1,
+      "usuario_id": null,
+      "titulo": "🚛 Recojo mañana",
+      "mensaje": "El recojo es mañana lunes a las 18:00. Prepara tus bolsas.",
+      "leida": 0,
+      "created_at": "2026-06-03 02:20:22"
+    },
+    {
+      "id": 2,
+      "usuario_id": null,
+      "titulo": "♻️ Semana de Reciclaje",
+      "mensaje": "Esta semana hay punto de acopio especial en ACOPIO 56.",
+      "leida": 0,
+      "created_at": "2026-06-03 02:20:22"
+    }
+  ],
+  "contactos": []
+}

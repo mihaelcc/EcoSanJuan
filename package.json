@@ -1,0 +1,10 @@
+{
+  "name": "ecosanjuan",
+  "version": "1.0.0",
+  "description": "EcoSanJuan - Gestión de Residuos Sólidos SJM",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
