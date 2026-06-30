@@ -1,6 +1,16 @@
 // ─────────────────────────────────────────────────────────────────
 //  EcoSanJuan — app.js (Frontend SPA)
 // ─────────────────────────────────────────────────────────────────
+const ENCUESTA_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor';
+function abrirEncuesta(e) {
+  if (e) e.preventDefault();
+  const w = window.open(ENCUESTA_URL, '_blank');
+  if (!w || w.closed || typeof w.closed === 'undefined') {
+    // El navegador bloqueó el popup (común en WebView de APK) → navega en la misma ventana
+    window.location.href = ENCUESTA_URL;
+  }
+}
+
 let TOKEN = localStorage.getItem('eco_token') || null;
 let USER  = JSON.parse(localStorage.getItem('eco_user') || 'null');
 let viewStack = [];
@@ -140,8 +150,11 @@ function loadRegistroView() {
   setEl('reg-hora', `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} (al registrar)`);
   setEl('reg-user-name', USER?.nombre || '—');
   setEl('reg-user-dni', USER?.dni || '—');
-  // Preseleccionar zona del usuario
-  if (USER?.zona) { const sel = document.getElementById('reg-zona'); if (sel) sel.value = 'ZONA ' + USER.zona; }
+  const sel = document.getElementById('reg-zona');
+  if (sel) {
+    if (USER?.zona) sel.value = 'ZONA ' + USER.zona;
+    else sel.selectedIndex = 0;
+  }
   loadMisRegistros();
 }
 function changeBolsas(delta) { bolsasCount = Math.max(1, Math.min(20, bolsasCount + delta)); setEl('bolsas-count', bolsasCount); }
@@ -149,9 +162,11 @@ function selectTipo(tipo) { tipoSeleccionado = tipo; ['organico','reciclable','g
 function selectSelectiva(val) { selectivaSeleccionada = val; document.getElementById('sel-si')?.classList.toggle('selected', val); document.getElementById('sel-no')?.classList.toggle('selected', !val); }
 
 async function registrarBolsas() {
+  const zona = document.getElementById('reg-zona').value;
+  if (!zona) { toast('⚠️ Selecciona tu Zona de acopio'); return; }
   try {
-    const r = await api('POST','/api/residuos',{ bolsas:bolsasCount, tipo:tipoSeleccionado, zona:document.getElementById('reg-zona').value, selectiva:selectivaSeleccionada?1:0, observaciones:document.getElementById('reg-obs').value });
-    toast(`✅ Registrado a las ${r.hora} (demora: ${r.demora_min} min)`);
+    const r = await api('POST','/api/residuos',{ bolsas:bolsasCount, tipo:tipoSeleccionado, zona, selectiva:selectivaSeleccionada?1:0, observaciones:document.getElementById('reg-obs').value });
+    toast(`✅ Registrado a las ${r.hora} (demora: ${r.demora_fmt})`);
     document.getElementById('reg-obs').value = '';
     bolsasCount = 1; setEl('bolsas-count', 1);
     loadMisRegistros(); loadDashboardUser();
@@ -166,12 +181,11 @@ async function loadMisRegistros() {
     el.innerHTML = rows.slice(0,6).map(r => `
       <div style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-bottom:1px solid var(--border);">
         <span style="font-size:1.1rem;">${tipoIcon(r.tipo)}</span>
-        <div style="flex:1;"><div style="font-size:.8rem;font-weight:600;color:var(--text);">${r.bolsas} bolsa${r.bolsas>1?'s':''} · ${r.zona}</div><div style="font-size:.7rem;color:var(--text-gray);">${r.fecha} · ${r.hora}</div></div>
+        <div style="flex:1;"><div style="font-size:.8rem;font-weight:600;color:var(--text);">${r.bolsas} bolsa${r.bolsas>1?'s':''} · ${r.zona}</div><div style="font-size:.7rem;color:var(--text-gray);">${r.fecha} · ${r.hora} · demora ${r.demora_fmt||''}</div></div>
         <span class="badge ${tipoBadge(r.tipo)}">${r.tipo}</span>
       </div>`).join('');
   } catch(e){ el.innerHTML = '<div class="empty"><span class="empty-text">Error cargando</span></div>'; }
 }
-
 function loadTiemposView() {
   api('GET','/api/dashboard').then(d => {
     setEl('avg-semanal', d.promedioPost + ' min');
@@ -365,10 +379,20 @@ function renderTablaRegistros(rows) {
   rows = rows || allRegistros;
   const tbody = document.getElementById('tabla-registros-admin'); if (!tbody) return;
   const page = rows.slice(regPage*REG_PER_PAGE, (regPage+1)*REG_PER_PAGE);
-  tbody.innerHTML = page.map(r => `<tr><td>${r.fecha?.slice(5)||r.fecha}</td><td style="font-size:.68rem;">${(r.nombre||'—').split(' ').slice(0,2).join(' ')}</td><td style="text-align:center;font-weight:700;">${r.bolsas}</td><td><span class="badge ${tipoBadge(r.tipo)}">${r.tipo.slice(0,3)}</span></td><td style="font-size:.68rem;">${r.zona}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--text-gray);">Sin registros</td></tr>';
+  tbody.innerHTML = page.map(r => `<tr><td>${r.fecha?.slice(5)||r.fecha}</td><td style="font-size:.68rem;">${(r.nombre||'—').split(' ').slice(0,2).join(' ')}</td><td style="text-align:center;font-weight:700;">${r.bolsas}</td><td><span class="badge ${tipoBadge(r.tipo)}">${r.tipo.slice(0,3)}</span></td><td style="font-size:.68rem;">${r.zona}</td><td><span class="badge ${r.periodo==='PRE'?'badge-yellow':r.periodo==='POST'?'badge-green':'badge-blue'}">${r.periodo||'—'}</span></td><td><button onclick="eliminarRegistro(${r.id})" style="background:none;border:none;cursor:pointer;font-size:.9rem;color:var(--red);" title="Eliminar">🗑️</button></td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--text-gray);">Sin registros</td></tr>';
   const totalPags = Math.ceil(rows.length/REG_PER_PAGE);
   const pag = document.getElementById('reg-paginacion');
   if (pag) pag.innerHTML = Array.from({length:Math.min(totalPags,8)},(_,i)=>`<button onclick="regPage=${i};renderTablaRegistros()" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:${i===regPage?'var(--g-mid)':'white'};color:${i===regPage?'white':'var(--text-gray)'};cursor:pointer;font-size:.78rem;">${i+1}</button>`).join('');
+}
+async function eliminarRegistro(id) {
+  if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+  try {
+    await api('DELETE', `/api/residuos/${id}`);
+    toast('🗑️ Registro eliminado');
+    allRegistros = allRegistros.filter(r => r.id !== id);
+    renderTablaRegistros();
+    loadDashboardAdmin();
+  } catch(e) { toast('❌ ' + e.message); }
 }
 
 let allTiempos = [], tiePage = 0; const TIE_PER_PAGE = 12;

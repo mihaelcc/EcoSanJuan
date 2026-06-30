@@ -30,9 +30,19 @@ function loadDB() {
 }
 function saveDB(db) { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); }
 function nextId(arr) { return arr.length ? Math.max(...arr.map(r=>r.id||0)) + 1 : 1; }
-function now() { return new Date().toISOString().replace('T',' ').slice(0,19); }
-function today() { return new Date().toISOString().slice(0,10); }
+
+// ── Hora de Perú (UTC-5) — Railway corre en UTC, hay que ajustar siempre ──
+function horaPeru() {
+  const utcNow = new Date();
+  return new Date(utcNow.getTime() - (5 * 60 * 60 * 1000));
+}
+function now() { return horaPeru().toISOString().replace('T',' ').slice(0,19); }
+function today() { return horaPeru().toISOString().slice(0,10); }
 function hash(txt) { return crypto.createHash('sha256').update(txt).digest('hex'); }
+function fmtDemora(mins) {
+  const h = Math.floor(mins/60), m = Math.round(mins%60);
+  return h > 0 ? `${h}h ${m}min` : `${m}min`;
+}
 
 // La DB ya viene poblada con 60 usuarios desde ecosanjuan_data.json
 let db = loadDB();
@@ -90,24 +100,35 @@ app.get('/api/residuos', authMiddleware, (req, res) => {
   db = loadDB();
   let rows = db.residuos.slice().reverse();
   if (req.user.rol !== 'admin') rows = rows.filter(r => r.usuario_id === req.user.id);
-  rows = rows.map(r => ({ ...r, nombre: db.usuarios.find(u=>u.id===r.usuario_id)?.nombre||'—', bloque: db.usuarios.find(u=>u.id===r.usuario_id)?.bloque||'' }));
+  rows = rows.map(r => ({ ...r, nombre: db.usuarios.find(u=>u.id===r.usuario_id)?.nombre||'—', bloque: db.usuarios.find(u=>u.id===r.usuario_id)?.bloque||'', demora_fmt: fmtDemora(r.demora_min||0) }));
   res.json(rows.slice(0,500));
 });
 app.post('/api/residuos', authMiddleware, (req, res) => {
   db = loadDB();
   const { bolsas, tipo, zona, selectiva, observaciones } = req.body;
   if (!bolsas || !tipo || !zona) return res.status(400).json({ error:'Faltan campos' });
-  // Hora automática: el sistema guarda la hora actual al registrar
-  const ahora = new Date();
+  // Hora real de Perú (no UTC del servidor)
+  const ahora = horaPeru();
   const hora = `${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
-  // Demora desde las 18:00 (en minutos)
-  const demoraMin = Math.max(0, (ahora.getHours()*60 + ahora.getMinutes()) - (18*60));
-  const nuevo = { id:nextId(db.residuos), usuario_id:req.user.id, fecha:today(), hora, bolsas:Number(bolsas), tipo, zona, selectiva:selectiva??1, observaciones:observaciones||'', periodo:'POST', demora_min:demoraMin, created_at:now() };
+  // Demora desde las 18:00 (puede ser 0 si es antes de esa hora)
+  const minutosDesdeMedianoche = ahora.getHours()*60 + ahora.getMinutes();
+  const demoraMin = Math.max(0, minutosDesdeMedianoche - (18*60));
+  const fechaHoy = today();
+  // periodo: clasifica como PRE/POST solo si cae en esas fechas exactas; si no, "ACTUAL"
+  let periodo = 'ACTUAL';
+  if (fechaHoy >= '2025-12-08' && fechaHoy <= '2025-12-14') periodo = 'PRE';
+  else if (fechaHoy >= '2025-12-15' && fechaHoy <= '2025-12-21') periodo = 'POST';
+  const nuevo = { id:nextId(db.residuos), usuario_id:req.user.id, fecha:fechaHoy, hora, bolsas:Number(bolsas), tipo, zona, selectiva:selectiva??1, observaciones:observaciones||'', periodo, demora_min:demoraMin, created_at:now() };
   db.residuos.push(nuevo);
-  // Registrar tiempo automáticamente
-  db.tiempos.push({ id:nextId(db.tiempos), usuario_id:req.user.id, fecha:today(), segundos:demoraMin*60, tipo:'POST', created_at:now() });
+  // Solo se cuenta para los promedios de tesis si cae en las fechas exactas de PRE/POST.
+  // Registros fuera de esas fechas (ACTUAL) se guardan para historial/admin pero no alteran los indicadores.
+  if (periodo === 'PRE' || periodo === 'POST') {
+    db.tiempos.push({ id:nextId(db.tiempos), usuario_id:req.user.id, fecha:fechaHoy, segundos:demoraMin*60, tipo:periodo, created_at:now() });
+  } else {
+    db.tiempos.push({ id:nextId(db.tiempos), usuario_id:req.user.id, fecha:fechaHoy, segundos:demoraMin*60, tipo:'ACTUAL', created_at:now() });
+  }
   saveDB(db);
-  res.json({ id:nuevo.id, ok:true, hora, demora_min:demoraMin });
+  res.json({ id:nuevo.id, ok:true, hora, demora_min:demoraMin, demora_fmt:fmtDemora(demoraMin) });
 });
 app.delete('/api/residuos/:id', authMiddleware, (req, res) => {
   db = loadDB();
@@ -115,7 +136,11 @@ app.delete('/api/residuos/:id', authMiddleware, (req, res) => {
   const idx = db.residuos.findIndex(r => r.id === id);
   if (idx === -1) return res.status(404).json({ error:'No encontrado' });
   if (req.user.rol !== 'admin' && db.residuos[idx].usuario_id !== req.user.id) return res.status(403).json({ error:'Sin permiso' });
-  db.residuos.splice(idx, 1); saveDB(db); res.json({ ok:true });
+  const eliminado = db.residuos.splice(idx, 1)[0];
+  // También eliminar el tiempo asociado más cercano (mismo usuario/fecha) si existe y coincide
+  const tIdx = db.tiempos.findIndex(t => t.usuario_id===eliminado.usuario_id && t.fecha===eliminado.fecha && Math.abs(t.segundos - eliminado.demora_min*60) < 5);
+  if (tIdx !== -1) db.tiempos.splice(tIdx,1);
+  saveDB(db); res.json({ ok:true });
 });
 
 // ── TIEMPOS ───────────────────────────────────────────────────────
@@ -170,9 +195,10 @@ app.get('/api/dashboard', authMiddleware, (req, res) => {
 
   const totalUsuarios = db.usuarios.filter(u=>u.rol==='usuario'&&u.activo).length;
   const cumplimiento = esAdmin ? 92 : Math.min(100, Math.round((mis.length/7)*100));
+  const bolsasActual = mis.filter(r=>r.periodo==='ACTUAL').reduce((a,r)=>a+r.bolsas,0);
 
   res.json({
-    totalBolsas, bolsasPre, bolsasPost, bolsasHoy:bolsasPost, bolsasSemana:bolsasPost,
+    totalBolsas, bolsasPre, bolsasPost, bolsasActual, bolsasHoy:bolsasPost, bolsasSemana:bolsasPost,
     promedioPre:avgPre, promedioPost:avgPost, reduccion, incremento,
     porZona, porTipo, postDias, totalUsuarios, cumplimiento,
     totalResiduos: db.residuos.length,

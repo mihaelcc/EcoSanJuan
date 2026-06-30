@@ -190,7 +190,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
         <div class="card" style="cursor:pointer;text-align:center;padding:1.2rem .5rem;" onclick="goView('v-reportes-user')"><div style="font-size:2rem;">📊</div><div style="font-size:.72rem;font-weight:700;margin-top:.4rem;">REPORTES</div></div>
       </div>
       <!-- ENCUESTA DE SATISFACCIÓN -->
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey" style="margin-top:.75rem;">⭐ Encuesta de satisfacción</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" onclick="abrirEncuesta(event)" class="btn btn-survey" style="margin-top:.75rem;">⭐ Encuesta de satisfacción</a>
     </div>
     <nav class="bottom-nav" id="bnav-user">
       <button class="bnav-item active" onclick="bnav('v-home-user','bnav-user',this)"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
@@ -218,7 +218,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
         <div style="font-size:.72rem;font-weight:700;color:var(--g-mid);text-transform:uppercase;margin-bottom:.85rem;">DATOS DEL RESIDUO</div>
         <div class="form-group"><label class="form-label">Cantidad de bolsas</label><div class="form-counter"><button onclick="changeBolsas(-1)">−</button><span id="bolsas-count">1</span><button onclick="changeBolsas(1)">+</button></div></div>
         <div class="form-group"><label class="form-label">Tipo de residuo</label><div class="radio-group"><button class="radio-btn selected" id="tipo-organico" onclick="selectTipo('organico')">🌿 Orgánico</button><button class="radio-btn" id="tipo-reciclable" onclick="selectTipo('reciclable')">♻️ Reciclable</button><button class="radio-btn" id="tipo-general" onclick="selectTipo('general')">🗑️ General</button></div></div>
-        <div class="form-group"><label class="form-label">Zona de acopio</label><select class="form-select" id="reg-zona"><option>ZONA A</option><option>ZONA B</option><option>ZONA C</option><option>ZONA D</option></select></div>
+        <div class="form-group"><label class="form-label">Zona de acopio</label><select class="form-select" id="reg-zona"><option value="" disabled selected>Seleccione su Zona de acopio</option><option value="ZONA A">ZONA A</option><option value="ZONA B">ZONA B</option><option value="ZONA C">ZONA C</option><option value="ZONA D">ZONA D</option></select></div>
         <div class="form-group"><label class="form-label">Participa en recolección selectiva</label><div class="radio-group"><button class="radio-btn selected" id="sel-si" onclick="selectSelectiva(true)">✅ Sí</button><button class="radio-btn" id="sel-no" onclick="selectSelectiva(false)">❌ No</button></div></div>
         <div class="form-group"><label class="form-label">Observaciones:</label><textarea class="form-textarea" id="reg-obs" placeholder="Ingresa observaciones (opcional)"></textarea></div>
         <div class="info-box">ℹ️ Al registrar, el sistema guarda automáticamente la hora. El tiempo de demora se calcula desde las 18:00 (hora de recojo).</div>
@@ -285,7 +285,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
         </div>
       </div>
       <div class="card"><div class="card-title">📈 Comparación PRE vs POST (minutos)</div><div class="chart-bars" id="rep-chart-bars"><div class="chart-bar-wrap"><div class="chart-bar yellow" style="height:80px;"></div><div class="chart-bar-val">13.2</div><div class="chart-bar-label">PRE</div></div><div class="chart-bar-wrap"><div class="chart-bar green" style="height:60px;"></div><div class="chart-bar-val">10.6</div><div class="chart-bar-label">POST</div></div></div></div>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey" style="margin-bottom:.5rem;">⭐ Encuesta de satisfacción</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" onclick="abrirEncuesta(event)" class="btn btn-survey" style="margin-bottom:.5rem;">⭐ Encuesta de satisfacción</a>
       <button class="btn btn-outline" style="width:100%;" onclick="toast('Descarga de reporte PDF próximamente')">⬇️ Descarga reporte en PDF</button>
     </div>
     <nav class="bottom-nav">
@@ -306,7 +306,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
       <div class="menu-item" onclick="goView('v-cambiar-pass')"><div class="menu-icon">✏️</div><div class="menu-text">Cambiar contraseña</div><span class="menu-arrow">›</span></div>
       <div class="menu-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;gap:.75rem;"><div class="menu-icon">🔐</div><div class="menu-text">Verificación en dos pasos</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="menu-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;gap:.75rem;"><div class="menu-icon">🔔</div><div><div class="menu-text">Notificaciones</div><div style="font-size:.65rem;color:var(--text-gray);">Activar alertas de recojo</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="menu-item" style="border-color:#ddd6fe;background:#f5f3ff;"><div class="menu-icon" style="background:#ede9fe;">⭐</div><div class="menu-text" style="color:#6d28d9;font-weight:700;">Encuesta de satisfacción</div><span class="menu-arrow">›</span></a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" onclick="abrirEncuesta(event)" class="menu-item" style="border-color:#ddd6fe;background:#f5f3ff;"><div class="menu-icon" style="background:#ede9fe;">⭐</div><div class="menu-text" style="color:#6d28d9;font-weight:700;">Encuesta de satisfacción</div><span class="menu-arrow">›</span></a>
       <div class="menu-item"><div class="menu-icon">🚛</div><div><div class="menu-text">Disposiciones realizadas:</div><div style="font-size:.7rem;color:var(--text-gray);" id="perf-disp">—</div></div></div>
       <div class="menu-item"><div class="menu-icon">⏱️</div><div><div class="menu-text">Tiempo promedio:</div><div style="font-size:.7rem;color:var(--text-gray);" id="perf-tiempo">—</div></div></div>
       <div class="menu-item" style="border-color:#fca5a5;" onclick="logout()"><div class="menu-icon" style="background:#fee2e2;">⏻</div><div class="menu-text" style="color:var(--red);font-weight:700;">Cerrar sesión</div></div>
@@ -335,7 +335,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
     <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
     <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">CONFIGURACIÓN</span></div>
     <div class="view-body"><div class="card"><div class="card-title">🌿 Sobre EcoSanJuan</div><p style="font-size:.8rem;color:var(--text-gray);line-height:1.6;">Aplicativo móvil para la optimización de la gestión y monitoreo de residuos sólidos en San Juan de Miraflores, Lima 2026.</p><p style="font-size:.75rem;color:var(--text-gray);margin-top:.5rem;">Versión 1.0.0 · Universidad Autónoma del Perú</p></div>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey">⭐ Encuesta de satisfacción</a></div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" onclick="abrirEncuesta(event)" class="btn btn-survey">⭐ Encuesta de satisfacción</a></div>
   </div>
 
   <!-- HOME ADMIN -->
@@ -413,7 +413,7 @@ tr:nth-child(even) td{background:var(--g-xpale);}
   <div class="view" id="v-admin-registros">
     <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
     <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">REGISTRO DE TIEMPO</span><button class="topbar-action">▼</button></div>
-    <div class="view-body"><input class="form-input" placeholder="🔍 Buscar registro..." id="buscar-registro" oninput="filtrarRegistros()" style="margin-bottom:.75rem;"><div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Bolsas</th><th>Tipo</th><th>Zona</th></tr></thead><tbody id="tabla-registros-admin"></tbody></table></div><div id="reg-paginacion" style="display:flex;justify-content:center;gap:.4rem;margin-top:.75rem;flex-wrap:wrap;"></div></div>
+    <div class="view-body"><input class="form-input" placeholder="🔍 Buscar registro..." id="buscar-registro" oninput="filtrarRegistros()" style="margin-bottom:.75rem;"><div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Bolsas</th><th>Tipo</th><th>Zona</th><th>Periodo</th><th></th></tr></thead><tbody id="tabla-registros-admin"></tbody></table></div><div id="reg-paginacion" style="display:flex;justify-content:center;gap:.4rem;margin-top:.75rem;flex-wrap:wrap;"></div></div>
     <nav class="bottom-nav">
       <button class="bnav-item" onclick="goView('v-home-admin')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
       <button class="bnav-item active"><span class="bnav-icon">📋</span><span class="bnav-label">Registros</span></button>
