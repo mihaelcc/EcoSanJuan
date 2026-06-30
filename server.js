@@ -15,6 +15,12 @@ app.use(express.static(path.join(__dirname, 'frontend/public'), {
     if (filePath.endsWith('.png'))  res.setHeader('Content-Type', 'image/png');
     if (filePath.endsWith('.json')) res.setHeader('Content-Type', 'application/json');
     if (filePath.endsWith('.js'))   res.setHeader('Content-Type', 'application/javascript');
+    // Evitar que el navegador cachee HTML y JS (siempre cargar la última versión)
+    if (filePath.endsWith('.html') || filePath.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
   }
 }));
 
