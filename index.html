@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4a9e4a">
+<title>EcoSanJuan</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g-dark:#2d6a2d;--g-mid:#4a9e4a;--g-light:#7dc87d;--g-pale:#e8f5e8;--g-xpale:#f2faf2;
+  --yellow:#f5c518;--yellow-pale:#fffbea;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --text:#1a2e1a;--text-mid:#3d5c3d;--text-gray:#6b7c6b;--border:#d0e8d0;--white:#fff;
+  --shadow:0 2px 12px rgba(45,106,45,.12);--radius:16px;--radius-sm:10px;
+}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--g-xpale);color:var(--text);}
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;background:white;position:relative;box-shadow:0 0 40px rgba(0,0,0,.1);}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;height:100%;}
+.view.active{display:flex;}
+.status-bar{height:44px;background:var(--g-mid);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;flex-shrink:0;}
+.status-time{color:white;font-size:.75rem;font-weight:700;}
+.status-icons{color:white;font-size:.7rem;display:flex;gap:.3rem;}
+.topbar{background:var(--g-mid);padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.topbar-back{color:white;font-size:1.2rem;cursor:pointer;background:none;border:none;padding:.2rem;}
+.topbar-title{color:white;font-size:.9rem;font-weight:700;letter-spacing:.04em;flex:1;}
+.topbar-action{color:white;font-size:1.1rem;cursor:pointer;background:none;border:none;}
+.view-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem;}
+.view-body::-webkit-scrollbar{width:4px;}
+.view-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.bottom-nav{display:flex;background:white;border-top:1px solid var(--border);flex-shrink:0;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:.6rem .2rem .4rem;cursor:pointer;gap:.2rem;border:none;background:none;}
+.bnav-icon{font-size:1.3rem;}
+.bnav-label{font-size:.6rem;font-weight:600;color:var(--text-gray);}
+.bnav-item.active .bnav-label{color:var(--g-mid);}
+.card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem;}
+.card-title{font-size:.8rem;font-weight:700;color:var(--text-mid);margin-bottom:.6rem;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;}
+.stat-card{border-radius:var(--radius-sm);padding:.85rem;display:flex;flex-direction:column;gap:.2rem;}
+.stat-card.yellow{background:var(--yellow-pale);border:1px solid #fde68a;}
+.stat-card.green{background:var(--g-pale);border:1px solid var(--border);}
+.stat-card.purple{background:#f5f3ff;border:1px solid #ddd6fe;}
+.stat-card.pink{background:#fdf2f8;border:1px solid #fbcfe8;}
+.stat-label{font-size:.62rem;color:var(--text-gray);text-transform:uppercase;letter-spacing:.04em;}
+.stat-value{font-size:1.4rem;font-weight:800;color:var(--text);}
+.stat-sub{font-size:.62rem;color:var(--text-gray);}
+.menu-item{display:flex;align-items:center;gap:.75rem;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;margin-bottom:.5rem;cursor:pointer;transition:background .15s;}
+.menu-item:hover{background:var(--g-xpale);}
+.menu-icon{width:36px;height:36px;border-radius:10px;background:var(--g-pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.menu-text{flex:1;font-size:.88rem;font-weight:500;color:var(--text-mid);}
+.menu-arrow{color:var(--text-gray);font-size:.8rem;}
+.form-group{margin-bottom:.85rem;}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:.3rem;}
+.form-input,.form-select,.form-textarea{width:100%;padding:.65rem .85rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.88rem;color:var(--text);background:white;outline:none;transition:border-color .15s;font-family:inherit;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--g-mid);box-shadow:0 0 0 3px rgba(74,158,74,.15);}
+.form-textarea{min-height:80px;resize:vertical;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+.form-counter{display:flex;align-items:center;gap:.5rem;}
+.form-counter button{width:32px;height:32px;border:1.5px solid var(--border);border-radius:8px;background:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.form-counter span{font-size:1rem;font-weight:700;min-width:30px;text-align:center;}
+.radio-group{display:flex;gap:.5rem;flex-wrap:wrap;}
+.radio-btn{padding:.4rem .85rem;border:1.5px solid var(--border);border-radius:100px;font-size:.78rem;font-weight:600;cursor:pointer;background:white;color:var(--text-gray);transition:all .15s;}
+.radio-btn.selected{background:var(--g-mid);color:white;border-color:var(--g-mid);}
+.btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.75rem 1.2rem;border-radius:var(--radius-sm);font-size:.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:inherit;text-decoration:none;}
+.btn-primary{background:var(--g-mid);color:white;width:100%;}
+.btn-primary:hover{background:var(--g-dark);}
+.btn-secondary{background:var(--g-pale);color:var(--g-dark);border:1.5px solid var(--border);}
+.btn-danger{background:#fef2f2;color:var(--red);border:1.5px solid #fca5a5;}
+.btn-sm{padding:.4rem .85rem;font-size:.78rem;}
+.btn-outline{background:white;color:var(--g-mid);border:1.5px solid var(--g-mid);}
+.btn-survey{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;width:100%;}
+.badge{display:inline-block;padding:.2rem .65rem;border-radius:100px;font-size:.7rem;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-red{background:#fee2e2;color:#dc2626;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;}
+.badge-gray{background:#f3f4f6;color:#374151;}
+.badge-yellow{background:#fef3c7;color:#d97706;}
+.tbl-wrap{overflow-x:auto;margin:-1rem;padding:0 1rem;}
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+th{background:var(--g-mid);color:white;padding:.6rem .75rem;text-align:left;font-size:.72rem;}
+td{padding:.55rem .75rem;border-bottom:1px solid var(--border);color:var(--text-mid);}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:var(--g-xpale);}
+.profile-header{display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem;background:white;border-bottom:1px solid var(--border);}
+.avatar{width:72px;height:72px;border-radius:50%;background:var(--g-pale);display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin-bottom:.6rem;position:relative;}
+.avatar-edit{position:absolute;bottom:0;right:0;width:22px;height:22px;background:var(--g-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;cursor:pointer;}
+.profile-name{font-size:1rem;font-weight:700;color:var(--text);}
+.profile-info{font-size:.78rem;color:var(--text-gray);}
+.toggle{width:42px;height:22px;border-radius:100px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--g-mid);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:2px;left:2px;transition:transform .2s;}
+.toggle.on::after{transform:translateX(20px);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:.5rem;}
+.cal-day-header{text-align:center;font-size:.62rem;font-weight:700;color:var(--text-gray);padding:.2rem;}
+.cal-day{text-align:center;padding:.4rem;font-size:.8rem;border-radius:8px;cursor:pointer;}
+.cal-day.today{background:var(--g-mid);color:white;font-weight:700;}
+.cal-day.has-record{background:var(--g-pale);color:var(--g-dark);font-weight:600;}
+.cal-day.empty{color:transparent;}
+.map-placeholder{background:#e0f2fe;border-radius:var(--radius);height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#0284c7;font-size:.85rem;margin-bottom:.75rem;}
+.chart-bars{display:flex;gap:.4rem;align-items:flex-end;height:100px;padding:0 .5rem;margin-bottom:.4rem;}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:.2rem;}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s ease;min-height:4px;}
+.chart-bar.green{background:linear-gradient(180deg,var(--g-light),var(--g-dark));}
+.chart-bar.yellow{background:linear-gradient(180deg,var(--yellow),#d97706);}
+.chart-bar-label{font-size:.55rem;color:var(--text-gray);}
+.chart-bar-val{font-size:.6rem;font-weight:700;color:var(--text);}
+.donut-wrap{display:flex;align-items:center;gap:1rem;}
+.donut-legend{flex:1;}
+.donut-item{display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;font-size:.75rem;}
+.donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+#splash{position:fixed;inset:0;background:var(--g-xpale);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;max-width:430px;margin:0 auto;}
+.splash-title{font-size:1.6rem;font-weight:800;color:var(--g-dark);margin-bottom:.3rem;}
+.splash-sub{font-size:.82rem;color:var(--text-gray);text-align:center;max-width:260px;margin-bottom:2rem;}
+.splash-btn{background:black;color:white;border:none;border-radius:100px;padding:.85rem 2.5rem;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:.5rem;width:240px;font-family:inherit;}
+.splash-btn.outline{background:transparent;color:black;border:2px solid black;}
+#login{position:fixed;inset:0;background:var(--g-xpale);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9998;max-width:430px;margin:0 auto;padding:2rem;}
+#login .logo{font-size:3rem;margin-bottom:.5rem;}
+#login h2{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:.3rem;}
+#login p{font-size:.82rem;color:var(--text-gray);margin-bottom:2rem;}
+.login-box{background:white;border-radius:var(--radius);padding:1.5rem;width:100%;max-width:320px;border:1px solid var(--border);}
+.login-error{background:#fee2e2;color:var(--red);border-radius:8px;padding:.5rem .75rem;font-size:.8rem;margin-bottom:.8rem;display:none;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--g-dark);color:white;padding:.6rem 1.2rem;border-radius:100px;font-size:.82rem;font-weight:600;z-index:9999;opacity:0;transition:all .3s;white-space:nowrap;max-width:90%;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8888;display:none;align-items:flex-end;max-width:430px;margin:0 auto;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:white;border-radius:20px 20px 0 0;width:100%;padding:1.5rem;max-height:85vh;overflow-y:auto;}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 1rem;}
+.modal-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:1rem;}
+.trend-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:100px;font-size:.72rem;font-weight:700;}
+.trend-up{background:#d1fae5;color:#065f46;}
+.trend-down{background:#fee2e2;color:#dc2626;}
+.empty{display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem;color:var(--text-gray);}
+.empty-icon{font-size:3rem;margin-bottom:.5rem;}
+.empty-text{font-size:.85rem;text-align:center;}
+.info-box{background:var(--yellow-pale);border-radius:8px;padding:.6rem;font-size:.72rem;color:#d97706;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div style="width:90px;height:90px;background:var(--g-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">♻️</div>
+  <div class="splash-title">EcoSanJuan</div>
+  <div class="splash-sub">Juntos por un San Juan de Miraflores más limpio y ordenado</div>
+  <button class="splash-btn" onclick="showLogin('usuario')">USUARIO</button>
+  <button class="splash-btn outline" onclick="showLogin('admin')">ADMINISTRADOR</button>
+</div>
+
+<div id="login">
+  <div class="logo">♻️</div>
+  <h2>BIENVENIDO</h2>
+  <p>Inicie sesión para continuar</p>
+  <div class="login-box">
+    <div class="login-error" id="login-error">DNI o contraseña incorrectos.</div>
+    <div class="form-group"><label class="form-label">DNI:</label><input class="form-input" id="login-dni" placeholder="Ingresa tu DNI" type="text"></div>
+    <div class="form-group"><label class="form-label">🔒 CONTRASEÑA:</label><input class="form-input" id="login-pass" placeholder="••••••••" type="password"></div>
+    <div style="text-align:right;margin-bottom:1rem;"><span style="font-size:.78rem;color:var(--g-mid);cursor:pointer;">¿Olvidaste tu contraseña?</span></div>
+    <button class="btn btn-primary" onclick="doLogin()" id="login-btn">COMENZAR</button>
+    <button class="btn btn-secondary" style="margin-top:.5rem;" onclick="backToSplash()">← Volver</button>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+
+  <!-- HOME USUARIO -->
+  <div class="view" id="v-home-user">
+    <div class="status-bar"><span class="status-time" id="clock-u">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div style="background:var(--g-mid);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:.5rem;"><span style="font-size:1.2rem;">👤</span><span id="user-name-header" style="color:white;font-size:.85rem;font-weight:700;">USUARIO</span></div>
+      <div style="display:flex;gap:.6rem;"><button class="topbar-action" onclick="goView('v-notif-user')">🔔</button><button class="topbar-action" onclick="goView('v-config-user')">⚙️</button></div>
+    </div>
+    <div class="view-body">
+      <div class="stat-grid" style="background:var(--yellow-pale);border-radius:var(--radius);padding:.85rem;border:1px solid #fde68a;margin-bottom:.75rem;">
+        <div><div class="stat-label" style="color:#d97706;">ESTA SEMANA</div><div class="stat-value" id="bolsas-semana-u">—</div><div class="stat-sub">bolsas registradas</div></div>
+        <div><div class="stat-label" style="color:#d97706;">TOTAL</div><div class="stat-value" id="bolsas-hoy-u">—</div><div class="stat-sub">unidades</div></div>
+      </div>
+      <div class="card" style="margin-bottom:.75rem;">
+        <div class="card-title">📊 Índice de Cumplimiento</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div style="flex:1;background:var(--border);border-radius:100px;height:10px;overflow:hidden;"><div id="cumpl-bar" style="background:var(--g-mid);height:100%;width:0%;border-radius:100px;transition:width .6s;"></div></div>
+          <span id="cumpl-pct" style="font-size:.9rem;font-weight:800;color:var(--g-dark);">0%</span>
+        </div>
+        <div id="prox-recojo" style="margin-top:.5rem;font-size:.75rem;color:var(--text-gray);">🚛 Próximo recojo: —</div>
+      </div>
+      <div style="font-size:.72rem;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">PANEL DE GESTIÓN DE RESIDUOS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        <div class="card" style="cursor:pointer;text-align:center;padding:1.2rem .5rem;" onclick="goView('v-registro')"><div style="font-size:2rem;">🚛</div><div style="font-size:.72rem;font-weight:700;margin-top:.4rem;">REGISTRAR BOLSAS</div></div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:1.2rem .5rem;" onclick="goView('v-tiempo')"><div style="font-size:2rem;">⏱️</div><div style="font-size:.72rem;font-weight:700;margin-top:.4rem;">CONTROL DE TIEMPO</div></div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:1.2rem .5rem;" onclick="goView('v-calendario')"><div style="font-size:2rem;">📅</div><div style="font-size:.72rem;font-weight:700;margin-top:.4rem;">CALENDARIO</div></div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:1.2rem .5rem;" onclick="goView('v-reportes-user')"><div style="font-size:2rem;">📊</div><div style="font-size:.72rem;font-weight:700;margin-top:.4rem;">REPORTES</div></div>
+      </div>
+      <!-- ENCUESTA DE SATISFACCIÓN -->
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey" style="margin-top:.75rem;">⭐ Encuesta de satisfacción</a>
+    </div>
+    <nav class="bottom-nav" id="bnav-user">
+      <button class="bnav-item active" onclick="bnav('v-home-user','bnav-user',this)"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="bnav('v-registro','bnav-user',this)"><span class="bnav-icon">📦</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="bnav('v-reportes-user','bnav-user',this)"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="bnav('v-perfil','bnav-user',this)"><span class="bnav-icon">👤</span><span class="bnav-label">Perfil</span></button>
+    </nav>
+  </div>
+
+  <!-- REGISTRAR BOLSAS -->
+  <div class="view" id="v-registro">
+    <div class="status-bar"><span class="status-time" id="clock-r">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">REGISTRAR BOLSAS</span><span style="font-size:1rem;">📋</span></div>
+    <div class="view-body">
+      <div class="card">
+        <div style="font-size:.82rem;font-weight:800;color:var(--text);margin-bottom:1rem;">DATOS DE REGISTRO</div>
+        <div class="form-row" style="margin-bottom:.85rem;">
+          <div><div class="form-label">📅 Fecha</div><div style="background:var(--g-xpale);border-radius:8px;padding:.5rem .75rem;font-size:.82rem;color:var(--text-mid);" id="reg-fecha">—</div></div>
+          <div><div class="form-label">⏰ Hora (automática)</div><div style="background:var(--g-xpale);border-radius:8px;padding:.5rem .75rem;font-size:.82rem;color:var(--text-mid);" id="reg-hora">—</div></div>
+        </div>
+        <div class="form-group"><label class="form-label">👤 Usuario</label><div style="background:var(--g-xpale);border-radius:8px;padding:.5rem .75rem;font-size:.82rem;color:var(--text-mid);" id="reg-user-name">—</div></div>
+        <div class="form-group"><div class="form-label">🪪 DNI</div><div style="background:var(--g-xpale);border-radius:8px;padding:.5rem .75rem;font-size:.82rem;color:var(--text-mid);" id="reg-user-dni">—</div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:.72rem;font-weight:700;color:var(--g-mid);text-transform:uppercase;margin-bottom:.85rem;">DATOS DEL RESIDUO</div>
+        <div class="form-group"><label class="form-label">Cantidad de bolsas</label><div class="form-counter"><button onclick="changeBolsas(-1)">−</button><span id="bolsas-count">1</span><button onclick="changeBolsas(1)">+</button></div></div>
+        <div class="form-group"><label class="form-label">Tipo de residuo</label><div class="radio-group"><button class="radio-btn selected" id="tipo-organico" onclick="selectTipo('organico')">🌿 Orgánico</button><button class="radio-btn" id="tipo-reciclable" onclick="selectTipo('reciclable')">♻️ Reciclable</button><button class="radio-btn" id="tipo-general" onclick="selectTipo('general')">🗑️ General</button></div></div>
+        <div class="form-group"><label class="form-label">Zona de acopio</label><select class="form-select" id="reg-zona"><option>ZONA A</option><option>ZONA B</option><option>ZONA C</option><option>ZONA D</option></select></div>
+        <div class="form-group"><label class="form-label">Participa en recolección selectiva</label><div class="radio-group"><button class="radio-btn selected" id="sel-si" onclick="selectSelectiva(true)">✅ Sí</button><button class="radio-btn" id="sel-no" onclick="selectSelectiva(false)">❌ No</button></div></div>
+        <div class="form-group"><label class="form-label">Observaciones:</label><textarea class="form-textarea" id="reg-obs" placeholder="Ingresa observaciones (opcional)"></textarea></div>
+        <div class="info-box">ℹ️ Al registrar, el sistema guarda automáticamente la hora. El tiempo de demora se calcula desde las 18:00 (hora de recojo).</div>
+        <button class="btn btn-primary" onclick="registrarBolsas()">REGISTRAR ✓</button>
+      </div>
+      <div class="card"><div class="card-title">📋 Mis Últimos Registros</div><div id="mis-registros-list"><div class="empty"><span class="empty-icon">📦</span><span class="empty-text">Sin registros aún</span></div></div></div>
+    </div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-user')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">📦</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="goView('v-reportes-user')"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="goView('v-perfil')"><span class="bnav-icon">👤</span><span class="bnav-label">Perfil</span></button>
+    </nav>
+  </div>
+
+  <!-- CONTROL DE TIEMPO (sin cronómetro) -->
+  <div class="view" id="v-tiempo">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">🚛 CONTROL DE TIEMPO</span></div>
+    <div class="view-body">
+      <div class="card">
+        <div class="card-title">⏱️ Tiempo de disposición de residuos</div>
+        <div class="info-box" style="background:var(--g-pale);color:var(--g-dark);">El tiempo se mide automáticamente cuando registras tus bolsas a partir de las 18:00. No requiere cronómetro manual.</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);"><span style="font-size:.82rem;color:var(--text-mid);">⏱️ Mi tiempo promedio</span><span id="avg-diario" style="font-size:.82rem;font-weight:700;">—</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);"><span style="font-size:.82rem;color:var(--text-mid);">📊 Promedio general POST</span><span id="avg-semanal" style="font-size:.82rem;font-weight:700;">—</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;"><span style="font-size:.82rem;color:var(--text-mid);">🚛 Próximo recojo</span><span id="prox-t" style="font-size:.82rem;font-weight:700;color:var(--g-dark);">—</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">📋 Tendencia del Tiempo</div><div id="trend-tag-wrap" style="margin-bottom:.5rem;"></div><div id="mis-tiempos-list" style="font-size:.8rem;color:var(--text-gray);">Cargando...</div></div>
+    </div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div class="view" id="v-calendario">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">CALENDARIO</span><button class="topbar-action">⬇️</button></div>
+    <div class="view-body">
+      <div class="card" style="background:var(--yellow-pale);border:1px solid #fde68a;padding:.75rem;"><div style="font-size:.75rem;font-weight:700;color:#d97706;" id="cal-prox-recojo">🚛 Próximo recojo: —</div><div style="font-size:.72rem;color:#d97706;margin-top:.2rem;" id="cal-stats">✅ Días cumplidos: — &nbsp;&nbsp; ⚠️ Días con retraso: —</div></div>
+      <div style="font-size:1.2rem;font-weight:800;color:var(--text);margin:.75rem 0 .3rem;" id="cal-hora">09:30:11 am</div>
+      <div style="font-size:.78rem;color:var(--text-gray);margin-bottom:.75rem;" id="cal-fecha-larga">—</div>
+      <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;"><span style="font-size:.85rem;font-weight:700;" id="cal-mes-label">—</span><div style="display:flex;gap:.3rem;"><button style="background:none;border:none;font-size:1rem;cursor:pointer;" onclick="changeMonth(-1)">‹</button><button style="background:none;border:none;font-size:1rem;cursor:pointer;" onclick="changeMonth(1)">›</button></div></div><div class="cal-grid" id="cal-grid"></div></div>
+      <div class="card"><div class="card-title">📋 Agenda</div><input class="form-input" placeholder="Agrega un evento o un recordatorio" id="cal-evento"><button class="btn btn-secondary btn-sm" style="margin-top:.5rem;width:auto;" onclick="addCalEvent()">+ Agregar</button><div id="cal-eventos-list" style="margin-top:.5rem;"></div></div>
+    </div>
+  </div>
+
+  <!-- REPORTES USUARIO -->
+  <div class="view" id="v-reportes-user">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">REPORTES</span><button class="topbar-action" onclick="toast('Descarga de PDF próximamente')">📄</button></div>
+    <div class="view-body">
+      <div class="card"><div class="card-title">📅 Período analizado</div><div style="background:var(--g-xpale);border-radius:8px;padding:.6rem .85rem;font-size:.82rem;color:var(--text-mid);">Diciembre 2025 (PRE: 8-14 · POST: 15-21)</div></div>
+      <div class="card">
+        <div class="card-title">📊 Indicadores del sistema</div>
+        <div class="stat-grid">
+          <div class="stat-card green"><div class="stat-label">Usuarios activos</div><div class="stat-value" id="rep-usuarios">—</div></div>
+          <div class="stat-card yellow"><div class="stat-label">Total disposiciones</div><div class="stat-value" id="rep-total-disp">—</div></div>
+          <div class="stat-card purple"><div class="stat-label">T. promedio PRE</div><div class="stat-value" id="rep-pre">13.2m</div></div>
+          <div class="stat-card pink"><div class="stat-label">T. promedio POST</div><div class="stat-value" id="rep-post">10.6m</div></div>
+        </div>
+        <div class="form-row" style="margin-top:.5rem;">
+          <div class="stat-card green" style="display:flex;flex-direction:column;gap:.2rem;"><div class="stat-label">Cumplimiento</div><div class="stat-value" style="color:var(--g-dark);" id="rep-cumpl">—</div></div>
+          <div class="stat-card" style="background:#fee2e2;border-color:#fca5a5;"><div class="stat-label">Reducción tiempo</div><div class="stat-value" style="color:var(--red);" id="rep-red">-20%</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">📈 Comparación PRE vs POST (minutos)</div><div class="chart-bars" id="rep-chart-bars"><div class="chart-bar-wrap"><div class="chart-bar yellow" style="height:80px;"></div><div class="chart-bar-val">13.2</div><div class="chart-bar-label">PRE</div></div><div class="chart-bar-wrap"><div class="chart-bar green" style="height:60px;"></div><div class="chart-bar-val">10.6</div><div class="chart-bar-label">POST</div></div></div></div>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey" style="margin-bottom:.5rem;">⭐ Encuesta de satisfacción</a>
+      <button class="btn btn-outline" style="width:100%;" onclick="toast('Descarga de reporte PDF próximamente')">⬇️ Descarga reporte en PDF</button>
+    </div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-user')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="goView('v-registro')"><span class="bnav-icon">📦</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="goView('v-perfil')"><span class="bnav-icon">👤</span><span class="bnav-label">Perfil</span></button>
+    </nav>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="view" id="v-perfil">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">MI PERFIL</span></div>
+    <div class="profile-header"><div class="avatar">🙋<div class="avatar-edit">✏️</div></div><div class="profile-name" id="perfil-nombre">—</div><div class="profile-info" id="perfil-email">—</div><div class="profile-info" id="perfil-bloque">—</div></div>
+    <div class="view-body">
+      <div class="menu-item" onclick="goView('v-cambiar-pass')"><div class="menu-icon">🔒</div><div class="menu-text">Seguridad</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" onclick="goView('v-cambiar-pass')"><div class="menu-icon">✏️</div><div class="menu-text">Cambiar contraseña</div><span class="menu-arrow">›</span></div>
+      <div class="menu-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;gap:.75rem;"><div class="menu-icon">🔐</div><div class="menu-text">Verificación en dos pasos</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="menu-item" style="justify-content:space-between;"><div style="display:flex;align-items:center;gap:.75rem;"><div class="menu-icon">🔔</div><div><div class="menu-text">Notificaciones</div><div style="font-size:.65rem;color:var(--text-gray);">Activar alertas de recojo</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="menu-item" style="border-color:#ddd6fe;background:#f5f3ff;"><div class="menu-icon" style="background:#ede9fe;">⭐</div><div class="menu-text" style="color:#6d28d9;font-weight:700;">Encuesta de satisfacción</div><span class="menu-arrow">›</span></a>
+      <div class="menu-item"><div class="menu-icon">🚛</div><div><div class="menu-text">Disposiciones realizadas:</div><div style="font-size:.7rem;color:var(--text-gray);" id="perf-disp">—</div></div></div>
+      <div class="menu-item"><div class="menu-icon">⏱️</div><div><div class="menu-text">Tiempo promedio:</div><div style="font-size:.7rem;color:var(--text-gray);" id="perf-tiempo">—</div></div></div>
+      <div class="menu-item" style="border-color:#fca5a5;" onclick="logout()"><div class="menu-icon" style="background:#fee2e2;">⏻</div><div class="menu-text" style="color:var(--red);font-weight:700;">Cerrar sesión</div></div>
+    </div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-user')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="goView('v-registro')"><span class="bnav-icon">📦</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="goView('v-reportes-user')"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">👤</span><span class="bnav-label">Perfil</span></button>
+    </nav>
+  </div>
+
+  <div class="view" id="v-cambiar-pass">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">CAMBIAR CONTRASEÑA</span></div>
+    <div class="view-body"><div class="card"><div class="form-group"><label class="form-label">Contraseña actual</label><input class="form-input" id="pass-actual" type="password" placeholder="••••••••"></div><div class="form-group"><label class="form-label">Nueva contraseña</label><input class="form-input" id="pass-nueva" type="password" placeholder="••••••••"></div><div class="form-group"><label class="form-label">Confirmar nueva contraseña</label><input class="form-input" id="pass-confirm" type="password" placeholder="••••••••"></div><button class="btn btn-primary" onclick="cambiarPassword()">Actualizar contraseña</button></div></div>
+  </div>
+
+  <div class="view" id="v-notif-user">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">NOTIFICACIONES</span></div>
+    <div class="view-body" id="notif-user-list"><div class="empty"><span class="empty-icon">🔔</span><span class="empty-text">Sin notificaciones</span></div></div>
+  </div>
+
+  <div class="view" id="v-config-user">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">CONFIGURACIÓN</span></div>
+    <div class="view-body"><div class="card"><div class="card-title">🌿 Sobre EcoSanJuan</div><p style="font-size:.8rem;color:var(--text-gray);line-height:1.6;">Aplicativo móvil para la optimización de la gestión y monitoreo de residuos sólidos en San Juan de Miraflores, Lima 2026.</p><p style="font-size:.75rem;color:var(--text-gray);margin-top:.5rem;">Versión 1.0.0 · Universidad Autónoma del Perú</p></div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdt1AH05US4ZGsK0pD0yMZHRPjtCR5KZlaLFJ0BNUtk_EpWPg/viewform?usp=publish-editor" target="_blank" class="btn btn-survey">⭐ Encuesta de satisfacción</a></div>
+  </div>
+
+  <!-- HOME ADMIN -->
+  <div class="view" id="v-home-admin">
+    <div class="status-bar"><span class="status-time" id="clock-a">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div style="background:var(--g-mid);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;"><button style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;" onclick="openAdminMenu()">☰</button><span style="color:white;font-size:.85rem;font-weight:700;">PANEL DE CONTROL</span><button class="topbar-action" onclick="goView('v-notif-admin')">🔔</button></div>
+    <div class="view-body">
+      <div style="background:var(--g-xpale);border-radius:var(--radius-sm);padding:.6rem .85rem;display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;border:1px solid var(--border);"><span>📅</span><span style="font-size:.78rem;color:var(--text-mid);">Diciembre 2025 · PRE (8-14) vs POST (15-21)</span></div>
+      <div style="font-size:.72rem;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;">RESUMEN GENERAL</div>
+      <div class="stat-grid">
+        <div class="stat-card yellow"><div class="stat-label">T. promedio PRE</div><div class="stat-value" id="admin-pre">13.2 min</div><div style="font-size:.7rem;">⏱️</div></div>
+        <div class="stat-card green"><div class="stat-label">T. promedio POST</div><div class="stat-value" id="admin-post">10.6 min</div><div style="font-size:.7rem;">⏱️</div></div>
+        <div class="stat-card purple"><div class="stat-label">Reducción del tiempo</div><div class="stat-value" style="color:var(--purple);" id="admin-red">20%</div><div style="font-size:.6rem;">menos tiempo 📉</div></div>
+        <div class="stat-card pink"><div class="stat-label">Total de registros</div><div class="stat-value" style="color:#db2777;" id="admin-total">—</div><div style="font-size:.7rem;">disposiciones ✏️</div></div>
+      </div>
+      <div class="card"><div class="card-title">📊 Comparación PRE vs POST (minutos)</div><div class="chart-bars"><div class="chart-bar-wrap"><div class="chart-bar yellow" id="admin-bar-pre" style="height:80px;"></div><div class="chart-bar-val" id="admin-bar-pre-v">13.2</div><div class="chart-bar-label">PRE</div></div><div class="chart-bar-wrap"><div class="chart-bar green" id="admin-bar-post" style="height:60px;"></div><div class="chart-bar-val" id="admin-bar-post-v">10.6</div><div class="chart-bar-label">POST</div></div></div></div>
+      <div class="card"><div class="card-title">🏘️ Bolsas por Zona de Acopio</div><div id="admin-zonas"></div></div>
+      <div class="card"><div class="card-title">⚡ Accesos rápidos</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;"><button class="btn btn-secondary btn-sm" onclick="goView('v-admin-usuarios')">👥 Usuarios</button><button class="btn btn-secondary btn-sm" onclick="goView('v-admin-reportes')">📊 Reportes</button><button class="btn btn-secondary btn-sm" onclick="goView('v-admin-registros')">📋 Registros</button><button class="btn btn-secondary btn-sm" onclick="goView('v-admin-tiempos')">⏱️ Tiempos</button></div></div>
+    </div>
+    <nav class="bottom-nav" id="bnav-admin">
+      <button class="bnav-item active" onclick="bnav('v-home-admin','bnav-admin',this)"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="bnav('v-admin-registros','bnav-admin',this)"><span class="bnav-icon">📋</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="bnav('v-admin-reportes','bnav-admin',this)"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="bnav('v-admin-usuarios','bnav-admin',this)"><span class="bnav-icon">👥</span><span class="bnav-label">Usuarios</span></button>
+    </nav>
+  </div>
+
+  <div id="admin-menu-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:7777;display:none;max-width:430px;margin:0 auto;" onclick="closeAdminMenu()">
+    <div style="width:280px;height:100%;background:white;display:flex;flex-direction:column;overflow-y:auto;">
+      <div style="background:var(--g-xpale);padding:1.2rem 1rem;"><div style="display:flex;align-items:center;gap:.75rem;"><div style="width:44px;height:44px;background:var(--g-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">👤</div><div><div style="font-size:.9rem;font-weight:700;color:var(--text);" id="admin-menu-name">Admin</div><div style="font-size:.72rem;color:var(--text-gray);" id="admin-menu-email">admin@...</div></div></div></div>
+      <div style="padding:.75rem;">
+        <div style="font-size:.65rem;font-weight:700;color:var(--text-gray);text-transform:uppercase;padding:.4rem .5rem;">MENÚ PRINCIPAL</div>
+        <div class="menu-item" onclick="closeAdminMenu();bnav('v-home-admin','bnav-admin',null);goView('v-home-admin')"><div class="menu-icon">🏠</div><div class="menu-text">Inicio</div></div>
+        <div class="menu-item" onclick="closeAdminMenu();goView('v-admin-tiempos')"><div class="menu-icon">⏱️</div><div class="menu-text">Control de tiempo</div></div>
+        <div class="menu-item" onclick="closeAdminMenu();goView('v-admin-usuarios')"><div class="menu-icon">👥</div><div class="menu-text">Registros de usuarios</div></div>
+        <div class="menu-item" onclick="closeAdminMenu();goView('v-admin-reportes')"><div class="menu-icon">📊</div><div class="menu-text">Reportes y análisis</div></div>
+        <div class="menu-item" onclick="closeAdminMenu();goView('v-notif-admin')"><div class="menu-icon">🔔</div><div class="menu-text">Notificaciones</div></div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--text-gray);text-transform:uppercase;padding:.6rem .5rem .4rem;">ADMINISTRACIÓN</div>
+        <div class="menu-item" onclick="closeAdminMenu();goView('v-admin-contactos')"><div class="menu-icon">📬</div><div class="menu-text">Mensajes de contacto</div></div>
+        <div style="height:1px;background:var(--border);margin:.5rem 0;"></div>
+        <div class="menu-item" style="border-color:#fca5a5;" onclick="logout()"><div class="menu-icon" style="background:#fee2e2;">⏻</div><div class="menu-text" style="color:var(--red);font-weight:700;">Cerrar sesión</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="v-admin-usuarios">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">USUARIO DEL SISTEMA</span><button class="topbar-action" onclick="openModalNuevoUsuario()">+</button></div>
+    <div class="view-body"><input class="form-input" placeholder="🔍 Buscar usuario..." id="buscar-usuario" oninput="filtrarUsuarios()" style="margin-bottom:.75rem;"><div class="tbl-wrap"><table><thead><tr><th>Usuario</th><th>Zona</th><th>Rol</th><th>Estado</th><th></th></tr></thead><tbody id="tabla-usuarios"></tbody></table></div></div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-admin')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-registros')"><span class="bnav-icon">📋</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-reportes')"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">👥</span><span class="bnav-label">Usuarios</span></button>
+    </nav>
+  </div>
+
+  <div class="view" id="v-admin-reportes">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">REPORTES Y ANÁLISIS</span></div>
+    <div class="view-body">
+      <div class="card"><div style="display:flex;align-items:center;gap:.5rem;"><span>📅</span><span style="font-size:.82rem;color:var(--text-mid);">15 - 21 diciembre 2025 (POST)</span></div></div>
+      <div class="card"><div class="card-title">📈 Tendencia diaria del tiempo (POST)</div><div style="height:80px;display:flex;align-items:flex-end;gap:4px;" id="admin-trend-chart"></div><div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--text-gray);margin-top:.2rem;" id="admin-trend-labels"></div></div>
+      <div class="card"><div class="card-title">🥧 Comparación PRE vs POST (Promedio)</div><div class="donut-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="35" fill="none" stroke="#f5c518" stroke-width="18"/><circle cx="45" cy="45" r="35" fill="none" stroke="#4a9e4a" stroke-width="18" stroke-dasharray="44 176" transform="rotate(-90 45 45)" id="donut-green"/><text x="45" y="49" text-anchor="middle" font-size="11" font-weight="800" fill="#2d6a2d" id="donut-label">20%</text></svg><div class="donut-legend"><div class="donut-item"><div class="donut-dot" style="background:#f5c518;"></div>PRE: <b id="legend-pre">13.2 min</b></div><div class="donut-item"><div class="donut-dot" style="background:#4a9e4a;"></div>POST: <b id="legend-post">10.6 min</b></div></div></div></div>
+      <div class="card"><div class="card-title">📋 Resumen del período</div><div style="display:flex;flex-direction:column;gap:.4rem;font-size:.82rem;"><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-gray);">Promedio PRE (antes)</span><span id="res-pre" style="font-weight:700;">13.2 min</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-gray);">Promedio POST (después)</span><span id="res-post" style="font-weight:700;">10.6 min</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-gray);">Reducción del tiempo</span><span id="res-red" style="font-weight:700;color:var(--g-dark);">20%</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-gray);">Incremento recolección</span><span id="res-inc" style="font-weight:700;color:var(--g-dark);">33%</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-gray);">Total de registros</span><span id="res-total" style="font-weight:700;">—</span></div></div></div>
+    </div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-admin')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-registros')"><span class="bnav-icon">📋</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-usuarios')"><span class="bnav-icon">👥</span><span class="bnav-label">Usuarios</span></button>
+    </nav>
+  </div>
+
+  <div class="view" id="v-admin-registros">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">REGISTRO DE TIEMPO</span><button class="topbar-action">▼</button></div>
+    <div class="view-body"><input class="form-input" placeholder="🔍 Buscar registro..." id="buscar-registro" oninput="filtrarRegistros()" style="margin-bottom:.75rem;"><div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Bolsas</th><th>Tipo</th><th>Zona</th></tr></thead><tbody id="tabla-registros-admin"></tbody></table></div><div id="reg-paginacion" style="display:flex;justify-content:center;gap:.4rem;margin-top:.75rem;flex-wrap:wrap;"></div></div>
+    <nav class="bottom-nav">
+      <button class="bnav-item" onclick="goView('v-home-admin')"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></button>
+      <button class="bnav-item active"><span class="bnav-icon">📋</span><span class="bnav-label">Registros</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-reportes')"><span class="bnav-icon">📊</span><span class="bnav-label">Reportes</span></button>
+      <button class="bnav-item" onclick="goView('v-admin-usuarios')"><span class="bnav-icon">👥</span><span class="bnav-label">Usuarios</span></button>
+    </nav>
+  </div>
+
+  <div class="view" id="v-admin-tiempos">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">CONTROL DE TIEMPOS</span></div>
+    <div class="view-body"><div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Tiempo</th><th>Tipo</th></tr></thead><tbody id="tabla-tiempos-admin"></tbody></table></div><div id="tie-paginacion" style="display:flex;justify-content:center;gap:.4rem;margin-top:.75rem;flex-wrap:wrap;"></div></div>
+  </div>
+
+  <div class="view" id="v-notif-admin">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">NOTIFICACIONES</span><button class="topbar-action" onclick="openModalNotif()">+</button></div>
+    <div class="view-body" id="notif-admin-list"></div>
+  </div>
+
+  <div class="view" id="v-admin-contactos">
+    <div class="status-bar"><span class="status-time">12:00</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+    <div class="topbar"><button class="topbar-back" onclick="goBack()">←</button><span class="topbar-title">MENSAJES DE CONTACTO</span></div>
+    <div class="view-body" id="contactos-list"></div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal-nuevo-usuario">
+  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">➕ Nuevo Usuario</div>
+    <div class="form-group"><label class="form-label">DNI *</label><input class="form-input" id="nu-dni" placeholder="DNI"></div>
+    <div class="form-group"><label class="form-label">Nombre completo *</label><input class="form-input" id="nu-nombre" placeholder="Nombre y apellidos"></div>
+    <div class="form-group"><label class="form-label">Correo *</label><input class="form-input" id="nu-email" type="email" placeholder="correo@ejemplo.com"></div>
+    <div class="form-group"><label class="form-label">Contraseña *</label><input class="form-input" id="nu-pass" type="password" placeholder="••••••••"></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Rol</label><select class="form-select" id="nu-rol"><option value="usuario">Usuario</option><option value="admin">Admin</option></select></div><div class="form-group"><label class="form-label">Zona</label><select class="form-select" id="nu-zona"><option>A</option><option>B</option><option>C</option><option>D</option></select></div></div>
+    <button class="btn btn-primary" onclick="crearUsuario()">Crear usuario</button>
+    <button class="btn btn-secondary" style="margin-top:.5rem;" onclick="closeModal('modal-nuevo-usuario')">Cancelar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-notif">
+  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">🔔 Enviar Notificación</div>
+    <div class="form-group"><label class="form-label">Título *</label><input class="form-input" id="notif-titulo" placeholder="Título"></div>
+    <div class="form-group"><label class="form-label">Mensaje *</label><textarea class="form-textarea" id="notif-mensaje" placeholder="Mensaje..."></textarea></div>
+    <button class="btn btn-primary" onclick="enviarNotif()">Enviar a todos</button>
+    <button class="btn btn-secondary" style="margin-top:.5rem;" onclick="closeModal('modal-notif')">Cancelar</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="/js/app.js"></script>
+</body>
+</html>

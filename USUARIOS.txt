@@ -1,0 +1,68 @@
+LISTA DE USUARIOS — EcoSanJuan (contraseña de todos: user123)
+
+======================================================================
+
+N°  DNI         NOMBRE                          DEPTO   ZONA
+----------------------------------------------------------------------
+1   54979419    María Vargas Espinoza           A-01    A
+2   65496489    Claudia Vásquez Rojas           B-01    B
+3   54059778    Patricia Aguilar Ramos          C-01    C
+4   57775807    Hugo Silva Ramírez              D-01    D
+5   57906335    María Sánchez Guzmán            A-02    A
+6   43887292    Fernando Salazar Espinoza       B-02    B
+7   44764265    Sofía Ríos Quispe               C-02    C
+8   56687044    Walter Herrera Vásquez          D-02    D
+9   59142751    Roberto Cárdenas Silva          A-03    A
+10  45501813    Eduardo Espinoza Huamán         B-03    B
+11  75496609    Andrés Guzmán Salazar           C-03    C
+12  47507729    Andrea Vega Quispe              D-03    D
+13  67629602    María Díaz Herrera              A-04    A
+14  51983483    Carlos Sánchez Cárdenas         B-04    B
+15  67406784    Verónica Medina Salazar         C-04    C
+16  55761764    Óscar Herrera Rojas             D-04    D
+17  48144237    Rosa Vega Espinoza              A-05    A
+18  55519695    Ana Castillo Ramírez            B-05    B
+19  66095765    Daniel León Mamani              C-05    C
+20  76199799    Luis Carrasco Mamani            D-05    D
+21  60238871    Eduardo Espinoza Vásquez        A-06    A
+22  69230909    Yolanda Carrasco Silva          B-06    B
+23  72787904    Ana Espinoza Ortiz              C-06    C
+24  79566507    Pedro Carrasco Vargas           D-06    D
+25  50012480    Luis Flores Ramírez             A-07    A
+26  42190423    Ramón Carrasco Mendoza          B-07    B
+27  68992952    Pamela Rojas Huamán             C-07    C
+28  42462702    Óscar Núñez Vega                D-07    D
+29  76966180    Sofía Torres Salazar            A-08    A
+30  57929653    Andrea Herrera Medina           B-08    B
+31  73708188    Jessica Huamán Castillo         C-08    C
+32  69123332    Verónica Ríos Rojas             D-08    D
+33  70947246    Jessica Ramírez Ríos            A-09    A
+34  59206164    Daniela Flores León             B-09    B
+35  58289000    Karina Romero Medina            C-09    C
+36  64929174    Daniela Cárdenas Paredes        D-09    D
+37  46645229    Walter Ramírez Ortiz            A-10    A
+38  79995650    Sofía Herrera Ramírez           B-10    B
+39  72143931    Pamela Mamani Flores            C-10    C
+40  68861505    Micaela Vega Chávez             D-10    D
+41  68382811    Jorge Ortiz Ramos               A-11    A
+42  49613444    Karina Quispe Díaz              B-11    B
+43  68851015    Alberto Sánchez Ramos           C-11    C
+44  78480201    Luis Cruz Reyes                 D-11    D
+45  49911297    Julio Ramos Ramos               A-12    A
+46  69676080    Andrés Pérez Carrasco           B-12    B
+47  70234094    Milagros Ramírez Flores         C-12    C
+48  60819299    Óscar Ramírez Ramos             D-12    D
+49  59850271    Miguel Ramírez Pérez            A-13    A
+50  55703671    Pamela Mendoza Campos           B-13    B
+51  70153302    Julio Torres Vargas             C-13    C
+52  50034091    María Cárdenas Chávez           D-13    D
+53  45745455    Eduardo Ortiz Díaz              A-14    A
+54  49049803    Ramón Carrasco Díaz             B-14    B
+55  57899322    Diego Aguilar Romero            C-14    C
+56  74432619    Hugo Núñez Aguilar              D-14    D
+57  77693217    Jessica Romero Paredes          A-15    A
+58  41763891    Lucía Espinoza León             B-15    B
+59  73746617    Patricia Castillo Reyes         C-15    C
+60  45450773    Eduardo Huamán Mamani           D-15    D
+
+ADMINISTRADOR → DNI: admin | Contraseña: admin123
